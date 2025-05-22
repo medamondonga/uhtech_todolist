@@ -1,3 +1,8 @@
+"""
+Administration des utilisateurs
+"""
 from django.contrib import admin
+from .models import Tache, Projet
 
-# Register your models here.
+admin.site.register(Tache)
+admin.site.register(Projet)
