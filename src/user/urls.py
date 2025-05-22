@@ -3,6 +3,7 @@ from todolist.generic_crud import (create_customized, list_customized,
                                    detail_update_delete_customized)
 from .models import User, Departement, Poste
 from .serializers import UserSerializer, PosteSerializer, DepartementSerializer
+from .views import PosteDepartementView
 
 urlpatterns=[
     path("register/",
@@ -33,5 +34,8 @@ urlpatterns=[
          detail_update_delete_customized(Departement, DepartementSerializer).as_view(),
          name="departement_action"),
 
+    path("<departement>/postes/",
+         PosteDepartementView.as_view(),
+         name="liste_poste"),
     
 ]

@@ -23,26 +23,30 @@ ETAT_CIVIL = [
 ]
 
 
-class Poste(models.Model):
-    """
-    class pour le poste
-    """
-    titre = models.CharField(max_length=100)
-    description = models.TextField()
-
-    def __str__(self):
-        return f"{self.titre}"
-
 class Departement(models.Model):
     """
     class pour le departement
     """
     nom = models.CharField(max_length=100)
     description = models.TextField()
-    postes = models.ManyToManyField(Poste, related_name="departements")
 
     def __str__(self):
         return f"{self.nom}"
+
+class Poste(models.Model):
+    """
+    class pour le poste
+    """
+    titre = models.CharField(max_length=100)
+    description = models.TextField()
+    departement = models.ForeignKey(Departement, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.titre}"
+
+
+
+
 
 class User(AbstractUser):
     """
