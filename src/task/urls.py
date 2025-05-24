@@ -5,10 +5,11 @@ from todolist.generic_crud import (
     create_customized,
     list_customized,
     detail_update_delete_customized,
+    list_filter_one_parameter,
 )
 from .models import Tache, Projet
 from .serializers import TacheSerializer, ProjetSerializer
-from .views import TacheProjetView
+from .views import AcceptTache
 
 urlpatterns = [
     # Endpoint pour créer une nouvelle tâche
@@ -29,6 +30,9 @@ urlpatterns = [
         name="tache_action"
     ),
 
+    path("accept/<int:id_tache>/", AcceptTache.as_view(),
+         name="Accepte-tache"),
+
     # Endpoint pour créer un nouveau projet
     path("new/project/",
         create_customized(Projet, ProjetSerializer).as_view(),
@@ -48,8 +52,8 @@ urlpatterns = [
     ),
 
     #Endpoint pour lister les taches d'un projet
-    path("<projet>/project/",
-         TacheProjetView.as_view(),
+    path("project/<int:projet_id>/",
+         list_filter_one_parameter(Tache, TacheSerializer, "projet_id").as_view(),
          name="Tache_du_projet"),
 
 ]

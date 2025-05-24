@@ -4,6 +4,7 @@ Fichier des mixins pour l'application de gestion de stock
 
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.mixins import (
     ListModelMixin, CreateModelMixin,
     UpdateModelMixin, RetrieveModelMixin,
@@ -16,12 +17,19 @@ CREATED = "Création réussie"
 DELETED = "Suppression réussie"
 MODIFIED = "Modification réussie"
 
-# Fonction générique de création
+class AuthenticatedAPIView(GenericAPIView):
+    """
+    Vue Generic qui protège les endpoints
+    """
+    permission_classes = [IsAuthenticated]
+
+
+#Fonction générique de création
 def create_customized(model, serializer):
     """
     Reçoit un modèle et un serializer, et retourne une vue qui permet la création d'un objet.
     """
-    class CustomCreateView(CreateModelMixin, GenericAPIView):
+    class CustomCreateView(CreateModelMixin, AuthenticatedAPIView):
         """
         Vue générique pour créer un objet.
         """
@@ -42,12 +50,12 @@ def create_customized(model, serializer):
 
     return CustomCreateView
 
-# Fonction générique pour lister les objets
+#Fonction générique pour lister les objets
 def list_customized(model, serializer):
     """
     Reçoit un modèle et un serializer, et retourne une vue qui permet de lister les objets.
     """
-    class ListCustomView(ListModelMixin, GenericAPIView):
+    class ListCustomView(ListModelMixin, AuthenticatedAPIView):
         """
         Vue générique pour lister les objets.
         """
@@ -62,7 +70,7 @@ def list_customized(model, serializer):
 
     return ListCustomView
 
-# Fonction générique pour les détails, la mise à jour et la suppression
+#Fonction générique pour les détails, la mise à jour et la suppression
 def detail_update_delete_customized(model, serializer):
     """
     Reçoit un modèle et un serializer, et retourne une vue permettant :
@@ -71,7 +79,7 @@ def detail_update_delete_customized(model, serializer):
     - de le supprimer
     """
 
-    class DetailCustomView(RetrieveModelMixin, GenericAPIView):
+    class DetailCustomView(RetrieveModelMixin, AuthenticatedAPIView):
         """
         Vue pour afficher les détails d’un objet.
         """
@@ -85,7 +93,7 @@ def detail_update_delete_customized(model, serializer):
             if kwargs.get('pk'):
                 return self.retrieve(request, *args, **kwargs)
 
-    class UpdateCustomView(UpdateModelMixin, GenericAPIView):
+    class UpdateCustomView(UpdateModelMixin, AuthenticatedAPIView):
         """
         Vue pour mettre à jour un objet.
         """
@@ -114,7 +122,7 @@ def detail_update_delete_customized(model, serializer):
                 }, status=status.HTTP_200_OK)
             return response
 
-    class DeleteCustomView(DestroyModelMixin, GenericAPIView):
+    class DeleteCustomView(DestroyModelMixin, AuthenticatedAPIView):
         """
         Vue pour supprimer un objet.
         """
@@ -139,6 +147,41 @@ def detail_update_delete_customized(model, serializer):
         - PUT/PATCH : modifier
         - DELETE : supprimer
         """
-        pass
 
     return CombineActionView
+
+#Fonction générique pour afficher des elements grace à des filtre
+def list_filter_one_parameter(model, serializer, element):
+    """
+    Retourne une vue listant les objets du modèle filtrés par un paramètre dynamique.
+    
+    Args:
+        model: Le modèle Django à utiliser.
+        serializer: Le serializer correspondant au modèle.
+        element: Le nom du champ utilisé pour filtrer (doit être dans les kwargs).
+    
+    Returns:
+        class: Une classe de vue Django REST Framework.
+    """
+
+    class ListFilterOne(ListModelMixin, AuthenticatedAPIView):
+        """
+        Vue générique pour lister les objets filtrés par un paramètre donné via l'URL.
+        """
+
+        serializer_class = serializer
+
+        def get_queryset(self):
+            """
+            Récupère les objets du modèle filtrés dynamiquement avec le champ spécifié.
+            """
+            value = self.kwargs.get(element)  # Récupère la valeur passée dans l'URL
+            return model.objects.filter(**{element: value})  # Utilisation du nom de champ dynamique
+
+        def get(self, request, *args, **kwargs):
+            """
+            Gère la requête GET pour retourner la liste filtrée.
+            """
+            return self.list(request, *args, **kwargs)
+
+    return ListFilterOne
