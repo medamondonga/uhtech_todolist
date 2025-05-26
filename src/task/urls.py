@@ -9,7 +9,9 @@ from todolist.generic_crud import (
 )
 from .models import Tache, Projet
 from .serializers import TacheSerializer, ProjetSerializer
-from .views import FinishTache, ListTachesTerminees, TachesTermineesParProjet, TachesEncoursParProjet
+from .views import (FinishTache, ListTachesTerminees, 
+                    TachesTermineesParProjet, TachesEncoursParProjet,
+                    PerformanceAgent, AssigneTacheAPIView)
 
 urlpatterns = [
     # Endpoint pour créer une nouvelle tâche
@@ -35,6 +37,9 @@ urlpatterns = [
         FinishTache.as_view(),
         name="Finish-tache"
     ),
+
+    path("<int:id_tache>/assigner/", AssigneTacheAPIView.as_view(), name="assigner-tache"),
+
 
     # Endpoint pour créer un nouveau projet
     path("project/new/",
@@ -83,4 +88,9 @@ urlpatterns = [
         TachesEncoursParProjet.as_view(),
         name="taches-encours-par-projet"
     ),
+
+    path("agent/<int:id_agent>/performance/<int:nombre_jour>/", 
+         PerformanceAgent.as_view(), 
+         name="performance-agent")
+
 ]

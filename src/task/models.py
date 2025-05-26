@@ -83,6 +83,14 @@ class Tache(models.Model):
         if self.date_debut and self.date_fin:
             self.nombre_jour_execution = (self.date_fin - self.date_debut).days
 
+    def assignee_tache(self, utilisateur_assignateur, liste_utilisateurs_assignes):
+        self.assigne_par = utilisateur_assignateur
+        self.save(update_fields=["assigne_par"])
+        self.assigne_a.add(liste_utilisateurs_assignes)
+        self.save()
+
+
+
     def __str__(self):
         """
         Représentation textuelle de l'objet Tache.

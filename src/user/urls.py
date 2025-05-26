@@ -11,13 +11,13 @@ from todolist.generic_crud import (
 )
 from .models import User, Departement, Poste
 from .serializers import UserSerializer, PosteSerializer, DepartementSerializer
-from .views import EmployeesByDepartement
+from .views import EmployeesByDepartement, RegisterView
 
 # Définition des routes de l'API pour les opérations sur les utilisateurs, postes et départements
 urlpatterns = [
     # Endpoint pour l'enregistrement d'un nouvel utilisateur
     path("auth/register/",
-        create_customized(User, UserSerializer).as_view(),
+        RegisterView.as_view(),
         name="inscription"
     ),
 
@@ -65,7 +65,7 @@ urlpatterns = [
 
     # Endpoint pour filtrer les postes d’un département
     path("departement/<int:departement_id>/postes/",
-        list_filter_one_parameter(Departement, DepartementSerializer, "departement_id").as_view(),
+        list_filter_one_parameter(Poste, PosteSerializer, "departement_id").as_view(),
         name="liste_poste_du_departement"
     ),
 

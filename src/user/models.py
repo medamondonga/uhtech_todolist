@@ -69,8 +69,6 @@ class User(AbstractUser):
     date_naissance = models.DateField(default=datetime.datetime.now)
     poste = models.ForeignKey(Poste, on_delete=models.SET_NULL, null=True)
     role = models.CharField(max_length=10, choices=ROLES)
-    taux_respect_delais = models.FloatField(null=True, blank=True)
-    taux_reactivite = models.FloatField(null=True, blank=True)
 
     def check_password(self, raw_password):
         """
