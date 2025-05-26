@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     #Appliaction ajouté
     'user', 'task', 'rest_framework', 
     'dj_rest_auth', 'rest_framework.authtoken',
-    'corsheaders', 'django.contrib.sites'
+    'corsheaders', #'django.contrib.sites'
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -141,5 +142,17 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000"
 ]
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Token': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization',
+            'description': "Collez ici votre token comme ceci : **Token <votre_token>**"
+        }
+    },
+    "LOGIN_URL": "/admin/login/",
+    "LOGOUT_URL": "/admin/logout/"
 
+}
 

@@ -12,14 +12,23 @@ class TacheSerializer(serializers.ModelSerializer):
         model = Tache
         fields = "__all__"
         read_only_fields = ['assigne_par', 'statut',
-                            'date_termine', 'taux_respect_delais'] 
+                            'date_termine', 'taux_respect_delais',
+                            'nombre_jour_execution', 'nombre_jour_reel'] 
 
     def create(self, validated_data):
-        # Injecte automatiquement l'utilisateur connecté
+    # Injecte automatiquement l'utilisateur connecté
         request = self.context.get('request', None)
         if request and request.user and request.user.is_authenticated:
             validated_data['assigne_par'] = request.user
-        return super().create(validated_data)
+
+    # Crée l'instance
+        instance = super().create(validated_data)
+
+    # Calcule les jours d'exécution
+        instance.definir_nombre_jour_execution()
+        instance.save()
+
+        return instance
     
     def to_representation(self, instance):
         #On met à jour le statut avant de le renvoyer

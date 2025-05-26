@@ -9,7 +9,7 @@ from todolist.generic_crud import (
 )
 from .models import Tache, Projet
 from .serializers import TacheSerializer, ProjetSerializer
-from .views import AcceptTache
+from .views import FinishTache, ListTachesTerminees, TachesTermineesParProjet, TachesEncoursParProjet
 
 urlpatterns = [
     # Endpoint pour créer une nouvelle tâche
@@ -19,7 +19,7 @@ urlpatterns = [
     ),
 
     # Endpoint pour lister toutes les tâches
-    path("/",
+    path("list/", 
         list_customized(Tache, TacheSerializer).as_view(),
         name="liste_tache"
     ),
@@ -30,17 +30,20 @@ urlpatterns = [
         name="tache_action"
     ),
 
-    path("accept/<int:id_tache>/", AcceptTache.as_view(),
-         name="Accepte-tache"),
+    # Endpoint pour marquer une tâche comme terminée
+    path("<int:id_tache>/finish/",
+        FinishTache.as_view(),
+        name="Finish-tache"
+    ),
 
     # Endpoint pour créer un nouveau projet
-    path("new/project/",
+    path("project/new/",
         create_customized(Projet, ProjetSerializer).as_view(),
         name="creer_projet"
     ),
 
     # Endpoint pour lister tous les projets
-    path("project//",
+    path("project/list/",
         list_customized(Projet, ProjetSerializer).as_view(),
         name="liste_projet"
     ),
@@ -51,9 +54,33 @@ urlpatterns = [
         name="projet_action"
     ),
 
-    #Endpoint pour lister les taches d'un projet
+    # Endpoint pour lister les tâches d’un projet donné
     path("project/<int:projet_id>/",
-         list_filter_one_parameter(Tache, TacheSerializer, "projet_id").as_view(),
-         name="Tache_du_projet"),
+        list_filter_one_parameter(Tache, TacheSerializer, "projet_id").as_view(),
+        name="Tache_du_projet"
+    ),
 
+    # Endpoint pour lister les tâches assignées à un agent spécifique
+    path("<int:assigne_a>/agent/",
+        list_filter_one_parameter(Tache, TacheSerializer, "assigne_a").as_view(),
+        name="Tache_d_un_agent"
+    ),
+
+    # Endpoint pour lister toutes les tâches terminées
+    path("terminees/",
+        ListTachesTerminees.as_view(),
+        name="taches-terminees"
+    ),
+
+    # Endpoint pour lister les tâches terminées d’un projet
+    path("projets/<int:projet_id>/taches_terminees/",
+        TachesTermineesParProjet.as_view(),
+        name="taches-terminees-par-projet"
+    ),
+
+    # Endpoint pour lister les tâches en cours d’un projet
+    path("projets/<int:projet_id>/taches_encours/",
+        TachesEncoursParProjet.as_view(),
+        name="taches-encours-par-projet"
+    ),
 ]

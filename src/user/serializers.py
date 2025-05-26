@@ -1,14 +1,20 @@
-"""Sérialiseur pour la gestion des utilisateurs dans l'application."""
+"""
+Sérialiseur pour la gestion des utilisateurs dans l'application.
+"""
 
 from rest_framework import serializers
 from .models import User, Poste, Departement
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Sérialiseur principal pour la création d'un utilisateur."""
+    """
+    Sérialiseur principal pour la création d'un utilisateur.
+    """
 
     class Meta:
-        """Configuration du serializer liée au modèle User."""
+        """
+        Configuration du serializer liée au modèle User.
+        """
         model = User
         fields = [
             "first_name", "last_name", "email", "sexe", "etat_civil",
@@ -39,18 +45,33 @@ class UserSerializer(serializers.ModelSerializer):
             telephone=validated_data["telephone"],
             date_naissance=validated_data["date_naissance"],
         )
-
         user.set_password(validated_data["password"])
         user.save()
 
         return user
 
+
 class PosteSerializer(serializers.ModelSerializer):
+    """
+    Sérialiseur pour le modèle Poste.
+    """
+
     class Meta:
+        """
+        Configuration du serializer liée au modèle Poste.
+        """
         model = Poste
-        fields = '__all__'
+        fields = "__all__"
+
 
 class DepartementSerializer(serializers.ModelSerializer):
+    """
+    Sérialiseur pour le modèle Departement.
+    """
+
     class Meta:
+        """
+        Configuration du serializer liée au modèle Departement.
+        """
         model = Departement
         fields = "__all__"

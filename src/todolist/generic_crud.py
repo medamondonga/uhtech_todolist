@@ -29,7 +29,7 @@ def create_customized(model, serializer):
     """
     Reçoit un modèle et un serializer, et retourne une vue qui permet la création d'un objet.
     """
-    class CustomCreateView(CreateModelMixin, AuthenticatedAPIView):
+    class CustomCreateView(CreateModelMixin, GenericAPIView):
         """
         Vue générique pour créer un objet.
         """
@@ -185,3 +185,78 @@ def list_filter_one_parameter(model, serializer, element):
             return self.list(request, *args, **kwargs)
 
     return ListFilterOne
+
+def list_filter_by_fields(model, serializer, filters: dict):
+    """
+    Retourne une vue listant les objets du modèle filtrés par plusieurs paramètres dynamiques.
+
+    Args:
+        model: Le modèle Django à utiliser.
+        serializer: Le serializer correspondant au modèle.
+        filters: Un dictionnaire contenant les champs et les valeurs à filtrer (ex: {"statut": "terminee"}).
+
+    Returns:
+        class: Une classe de vue Django REST Framework.
+    """
+
+    class ListFiltered(ListModelMixin, AuthenticatedAPIView):
+        serializer_class = serializer
+
+        def get_queryset(self):
+            return model.objects.filter(**filters)
+
+        def get(self, request, *args, **kwargs):
+            return self.list(request, *args, **kwargs)
+
+    return ListFiltered
+
+def list_filter_two_fields(model, serializer, param_name: str, filters: dict):
+    """
+    Vue générique filtrant un modèle par un champ transmis dans l'URL + autres filtres fixes.
+
+    Args:
+        model: Le modèle à utiliser.
+        serializer: Le serializer.
+        param_name: Le nom du paramètre URL (ex: "projet_id").
+        filters: Un dictionnaire des autres conditions à appliquer (ex: {"statut": "terminee"}).
+
+    Exemple : /projets/<int:projet_id>/taches_terminees/
+    """
+
+    class FilteredListView(ListModelMixin, AuthenticatedAPIView):
+        serializer_class = serializer
+
+        def get_queryset(self):
+            id_value = self.kwargs.get(param_name)
+            return model.objects.filter(**{param_name.replace('_id', ''): id_value}, **filters)
+
+        def get(self, request, *args, **kwargs):
+            return self.list(request, *args, **kwargs)
+
+    return FilteredListView
+
+def list_filter_by_related_field(model, serializer, param_name: str, field_lookup: str):
+    """
+    Vue générique filtrant les objets par un champ ForeignKey profond, passé via l’URL.
+
+    Args:
+        model: Le modèle à interroger.
+        serializer: Le serializer à utiliser.
+        param_name: Le nom du paramètre URL (ex: "departement_id").
+        field_lookup: Le champ à filtrer (ex: "poste__departement").
+
+    Exemple: /departements/<int:departement_id>/employees/
+    """
+
+    class FilteredListView(ListModelMixin, AuthenticatedAPIView):
+        serializer_class = serializer
+
+        def get_queryset(self):
+            value = self.kwargs.get(param_name)
+            return model.objects.filter(**{field_lookup: value})
+
+        def get(self, request, *args, **kwargs):
+            return self.list(request, *args, **kwargs)
+
+    return FilteredListView
+
