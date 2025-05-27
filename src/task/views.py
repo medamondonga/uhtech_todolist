@@ -1,6 +1,6 @@
 """Vue permettant de lister les tâches liées à un projet spécifique."""
 from datetime import datetime, timedelta
-from django.conf import settings
+from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from todolist.generic_crud import list_filter_by_fields, list_filter_two_fields
 from .models import Tache
-from .serializers import TacheSerializer
-from django.db.models import Avg
+from .serializers import TacheListSerializer
+
 
 
 User = get_user_model()
@@ -79,14 +79,14 @@ class AssigneTacheAPIView(APIView):
 # Vue listant toutes les tâches dont le statut est "terminée"
 ListTachesTerminees = list_filter_by_fields(
     model=Tache,
-    serializer=TacheSerializer,
+    serializer=TacheListSerializer,
     filters={"statut": "terminee"}
 )
 
 # Vue listant les tâches terminées pour un projet donné
 TachesTermineesParProjet = list_filter_two_fields(
     model=Tache,
-    serializer=TacheSerializer,
+    serializer=TacheListSerializer,
     param_name="projet_id",
     filters={"statut": "terminee"}
 )
@@ -94,7 +94,7 @@ TachesTermineesParProjet = list_filter_two_fields(
 # Vue listant les tâches en cours pour un projet donné
 TachesEncoursParProjet = list_filter_two_fields(
     model=Tache,
-    serializer=TacheSerializer,
+    serializer=TacheListSerializer,
     param_name="projet_id",
     filters={"statut": "en_cours"}
 )

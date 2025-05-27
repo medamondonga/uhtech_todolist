@@ -44,6 +44,7 @@ def create_customized(model, serializer):
 
             if response.status_code == status.HTTP_201_CREATED:
                 return Response({
+                    "status": True,
                     "message": f"{CREATED}"
                 }, status=status.HTTP_201_CREATED)
             return response

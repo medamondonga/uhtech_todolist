@@ -5,6 +5,7 @@ from datetime import datetime, date
 from django.db import models
 from django.conf import settings
 
+
 # Récupère le modèle utilisateur défini dans les settings
 User = settings.AUTH_USER_MODEL
 
@@ -49,7 +50,7 @@ class Tache(models.Model):
 
     projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name="projet")
 
-    assigne_par = models.ForeignKey(User, on_delete=models.CASCADE, related_name="taches_attribuees", blank=True, null=True)
+    assigne_par = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     assigne_a = models.ManyToManyField(User, related_name="taches_reçues")
 
     nombre_jour_execution = models.IntegerField(null=True, blank=True)

@@ -77,3 +77,18 @@ class DepartementSerializer(serializers.ModelSerializer):
         """
         model = Departement
         fields = "__all__"
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    #assigne_a = serializers.StringRelatedField(many=True)
+    poste = serializers.StringRelatedField()
+    class Meta:
+        """
+        Configuration du serializer liée au modèle User.
+        """
+        model = User
+        fields = [
+            "first_name", "last_name", "email", "sexe", "etat_civil",
+            "adresse", "telephone", "date_naissance", "password","poste",
+            ""
+        ]

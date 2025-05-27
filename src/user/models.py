@@ -80,7 +80,7 @@ class User(AbstractUser):
         """
         Représentation textuelle de l'utilisateur.
         """
-        return f"{self.username}"
+        return f"{self.email}"
 
 
 class Manager(User):

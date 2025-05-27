@@ -8,7 +8,8 @@ from todolist.generic_crud import (
     list_filter_one_parameter,
 )
 from .models import Tache, Projet
-from .serializers import TacheSerializer, ProjetSerializer
+from .serializers import (TacheSerializer, ProjetSerializer,
+                          TacheListSerializer, ProjetListSerializer)
 from .views import (FinishTache, ListTachesTerminees, 
                     TachesTermineesParProjet, TachesEncoursParProjet,
                     PerformanceAgent, AssigneTacheAPIView)
@@ -21,8 +22,8 @@ urlpatterns = [
     ),
 
     # Endpoint pour lister toutes les tâches
-    path("list/", 
-        list_customized(Tache, TacheSerializer).as_view(),
+    path("list/",
+        list_customized(Tache, TacheListSerializer).as_view(),
         name="liste_tache"
     ),
 
@@ -49,7 +50,7 @@ urlpatterns = [
 
     # Endpoint pour lister tous les projets
     path("project/list/",
-        list_customized(Projet, ProjetSerializer).as_view(),
+        list_customized(Projet, ProjetListSerializer).as_view(),
         name="liste_projet"
     ),
 
@@ -67,7 +68,7 @@ urlpatterns = [
 
     # Endpoint pour lister les tâches assignées à un agent spécifique
     path("<int:assigne_a>/agent/",
-        list_filter_one_parameter(Tache, TacheSerializer, "assigne_a").as_view(),
+        list_filter_one_parameter(Tache, TacheListSerializer, "assigne_a").as_view(),
         name="Tache_d_un_agent"
     ),
 
