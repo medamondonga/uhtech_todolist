@@ -82,4 +82,4 @@ Rôle : Développeuse backend
 
 Organisation : UHTech (projet de stage)
 
-Email : [medamondonga4@gmail.com]
+Email : medamondonga4@gmail.com
