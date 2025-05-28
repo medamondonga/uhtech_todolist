@@ -11,3 +11,4 @@ class IsManager(BasePermission):
 class IsAgent(BasePermission):
     def has_permission(self, request, view):
         return hasattr(request.user, 'role') and request.user.role == "agent"
+

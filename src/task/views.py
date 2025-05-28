@@ -80,14 +80,16 @@ class AssigneTacheAPIView(APIView):
 ListTacheProjet = list_filtered_view(
     model= Tache,
     serializer= TacheListSerializer,
-    url_param = "projet_id"
+    url_param = "projet_id",
+    field_lookup="projet",
 )
 
 ListTachesTerminees = list_filtered_view(
     model=Tache,
     serializer=TacheListSerializer,
     url_param="projet_id",
-    filters={"statut": "terminee"}
+    filters={"statut": "terminee"},
+    field_lookup="projet",
 )
 
 # Vue listant les tâches terminées pour un projet donné
