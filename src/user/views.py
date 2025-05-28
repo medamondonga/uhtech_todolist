@@ -3,7 +3,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.generics import GenericAPIView
-from todolist.generic_crud import list_filter_by_related_field
+from todolist.generic_crud import list_filtered_view
 from .models import User
 from .serializers import UserSerializer
 
@@ -30,9 +30,9 @@ class RegisterView(CreateModelMixin, GenericAPIView):
             return response
 
 
-EmployeesByDepartement =list_filter_by_related_field(
+EmployeesByDepartement =list_filtered_view(
     model=User,
     serializer=UserSerializer,
-    param_name="poste_id",
+    url_param="poste_id",
     field_lookup="poste__departement"
 )

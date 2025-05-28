@@ -4,11 +4,13 @@ from django.db.models import Avg
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from todolist.generic_crud import list_filter_by_fields, list_filter_two_fields
-from .models import Tache
-from .serializers import TacheListSerializer
+from todolist.generic_crud import list_filtered_view
+from todolist.permissions import IsAdmin, IsAgent, IsManager
+from .models import Tache, Projet
+from .serializers import TacheListSerializer, ProjetListSerializer
 
 
 
@@ -20,86 +22,107 @@ class FinishTache(APIView):
     """
     Vue permettant de marquer une tâche comme terminée.
     """
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, id_tache):
         """
         Méthode PATCH pour mettre à jour le statut d'une tâche comme terminée.
         """
         tache = get_object_or_404(Tache, id=id_tache)
+        agent =tache.assigne_a
+        manager = tache.assigne_par
         try:
-            tache.finish_task()
-            return Response(
-                {"message": "Tache terminée"},
-                status=status.HTTP_200_OK
-            )
+            if request.user == agent or request.user == manager:
+                tache.finish_task()
+                return Response(
+                    {"message": "Tache terminée"},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"message": "Cette tache ne vous apartient pas! "},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
         except ValueError:
             return Response(
                 {"message": "erreur"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+
 class AssigneTacheAPIView(APIView):
     """
-    Vue permettant d'assigner une tâche à un ou plusieurs agents.
+    Vue pour assigner une tâche à un seul agent (champ ForeignKey).
     """
+    permission_classes = [IsAuthenticated, IsManager]
 
     def patch(self, request, id_tache):
         tache = get_object_or_404(Tache, id=id_tache)
-        assignateur = request.user
+        id_agent = request.data.get("agent")
 
-        ids_agents = request.data.get("agents")  # Expects a list of user IDs
-
-        if not ids_agents:
+        if not id_agent:
             return Response(
-                {"message": "Liste d'agents requise pour l'assignation."},
+                {"message": "L'ID de l'agent est requis."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        try:
-            agents = User.objects.filter(id__in=ids_agents)
-            if not agents.exists():
-                return Response(
-                    {"message": "Aucun agent valide trouvé."},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+        agent = get_object_or_404(User, id=id_agent)
+        tache.assignee_tache(agent)
 
-            tache.assignee_tache(assignateur, agents)
+        return Response(
+            {"message": "Tâche assignée avec succès."},
+            status=status.HTTP_200_OK
+        )
 
-            return Response(
-                {"message": "Tâche assignée avec succès."},
-                status=status.HTTP_200_OK
-            )
 
-        except Exception as e:
-            return Response(
-                {"message": f"Erreur lors de l'assignation : {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
 
 # Vue listant toutes les tâches dont le statut est "terminée"
-ListTachesTerminees = list_filter_by_fields(
+ListTacheProjet = list_filtered_view(
+    model= Tache,
+    serializer= TacheListSerializer,
+    url_param = "projet_id"
+)
+
+ListTachesTerminees = list_filtered_view(
     model=Tache,
     serializer=TacheListSerializer,
+    url_param="projet_id",
     filters={"statut": "terminee"}
 )
 
 # Vue listant les tâches terminées pour un projet donné
-TachesTermineesParProjet = list_filter_two_fields(
+TachesTermineesParProjet = list_filtered_view(
     model=Tache,
     serializer=TacheListSerializer,
-    param_name="projet_id",
+    url_param="projet_id",
+    field_lookup="projet",
     filters={"statut": "terminee"}
 )
 
 # Vue listant les tâches en cours pour un projet donné
-TachesEncoursParProjet = list_filter_two_fields(
+TachesEncoursParProjet = list_filtered_view(
     model=Tache,
     serializer=TacheListSerializer,
-    param_name="projet_id",
+    url_param="projet_id",
+    field_lookup="projet",
     filters={"statut": "en_cours"}
 )
 
+TachesEnretardParProjet = list_filtered_view(
+    model=Tache,
+    serializer= TacheListSerializer,
+    url_param="projet_id",
+    field_lookup="projet",
+    filters={"statut": "en_retard"}
+)
 
+ListTacheAgent= list_filtered_view(
+    model=Tache,
+    serializer=TacheListSerializer,
+    url_param="assigne_a_id",
+    field_lookup="assigne_a"
+
+)
 
 
 

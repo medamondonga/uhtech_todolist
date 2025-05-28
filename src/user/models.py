@@ -6,9 +6,11 @@ import datetime
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth.hashers import check_password
+from todolist.models_mixins import SoftDeleteModel
 
 # Choix possibles pour les rôles d'utilisateur
 ROLES = [
+    ("admin", "Admin"),
     ("manager", "Manager"),
     ("agent", "Agent"),
 ]
@@ -28,7 +30,7 @@ ETAT_CIVIL = [
 ]
 
 
-class Departement(models.Model):
+class Departement(SoftDeleteModel):
     """
     Classe représentant un département.
     """
@@ -42,7 +44,7 @@ class Departement(models.Model):
         return f"{self.nom}"
 
 
-class Poste(models.Model):
+class Poste(SoftDeleteModel):
     """
     Classe représentant un poste dans un département.
     """

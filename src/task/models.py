@@ -4,6 +4,7 @@ Models liés à la gestion des taches
 from datetime import datetime, date
 from django.db import models
 from django.conf import settings
+from todolist.models_mixins import SoftDeleteModel
 
 
 # Récupère le modèle utilisateur défini dans les settings
@@ -22,7 +23,7 @@ STATUT_CHOICES = [
 ]
 
 
-class Projet(models.Model):
+class Projet(SoftDeleteModel):
     """
     Classe représentant un projet, composé de plusieurs tâches.
     """
@@ -37,7 +38,7 @@ class Projet(models.Model):
         return f"{self.nom}"
 
 
-class Tache(models.Model):
+class Tache(SoftDeleteModel):
     """
     Classe représentant une tâche liée à un projet.
     """
@@ -51,7 +52,7 @@ class Tache(models.Model):
     projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name="projet")
 
     assigne_par = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    assigne_a = models.ManyToManyField(User, related_name="taches_reçues")
+    assigne_a = models.ForeignKey(User, related_name="taches_reçues", on_delete=models.CASCADE,blank=True, null=True)
 
     nombre_jour_execution = models.IntegerField(null=True, blank=True)
     nombre_jour_reel = models.IntegerField(null=True, blank=True)
@@ -84,11 +85,12 @@ class Tache(models.Model):
         if self.date_debut and self.date_fin:
             self.nombre_jour_execution = (self.date_fin - self.date_debut).days
 
-    def assignee_tache(self, utilisateur_assignateur, liste_utilisateurs_assignes):
-        self.assigne_par = utilisateur_assignateur
-        self.save(update_fields=["assigne_par"])
-        self.assigne_a.add(liste_utilisateurs_assignes)
-        self.save()
+    def assignee_tache(self, utilisateur_assigne):
+        """
+        Assigne la tâche à un seul agent.
+        """
+        self.assigne_a = utilisateur_assigne
+        self.save(update_fields=["assigne_a"])
 
 
 

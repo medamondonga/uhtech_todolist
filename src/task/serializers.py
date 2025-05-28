@@ -58,7 +58,7 @@ class TacheListSerializer(serializers.ModelSerializer):
         Affiche le champ défini dans __str__() du modèle lié
     """
     projet = serializers.StringRelatedField()
-    assigne_a = serializers.StringRelatedField(many=True)
+    assigne_a = serializers.StringRelatedField()
     assigne_par = serializers.StringRelatedField()
 
     class Meta:

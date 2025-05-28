@@ -46,6 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
             adresse=validated_data["adresse"],
             telephone=validated_data["telephone"],
             date_naissance=validated_data["date_naissance"],
+            role=validated_data["role"],
         )
         user.set_password(validated_data["password"])
         user.save()
@@ -89,6 +90,6 @@ class UserListSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "first_name", "last_name", "email", "sexe", "etat_civil",
-            "adresse", "telephone", "date_naissance", "password","poste",
+            "adresse", "telephone", "date_naissance", "password","poste", "role"
             ""
         ]
