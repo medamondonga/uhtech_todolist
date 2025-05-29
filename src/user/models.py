@@ -60,10 +60,8 @@ class Poste(SoftDeleteModel):
 
 
 class User(AbstractUser):
-    """
-    Classe représentant l'utilisateur principal du système.
-    Hérite de AbstractUser pour intégrer l'authentification.
-    """
+    email = models.EmailField(unique=True)
+
     sexe = models.CharField(max_length=10, choices=SEXE, null=False, blank=False)
     etat_civil = models.CharField(max_length=50, choices=ETAT_CIVIL, null=False, blank=False)
     adresse = models.TextField()
@@ -71,6 +69,10 @@ class User(AbstractUser):
     date_naissance = models.DateField(default=datetime.datetime.now)
     poste = models.ForeignKey(Poste, on_delete=models.SET_NULL, null=True)
     role = models.CharField(max_length=10, choices=ROLES)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
+
 
     def check_password(self, raw_password):
         """

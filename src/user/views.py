@@ -3,6 +3,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.generics import GenericAPIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import EmailTokenObtainPairSerializer
 from todolist.generic_crud import list_filtered_view
 from .models import User
 from .serializers import UserSerializer
@@ -28,6 +30,11 @@ class RegisterView(CreateModelMixin, GenericAPIView):
                     "message": f"{CREATED}"
                 }, status=status.HTTP_201_CREATED)
             return response
+
+
+
+class EmailTokenObtainPairView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
 
 
 EmployeesByDepartement =list_filtered_view(

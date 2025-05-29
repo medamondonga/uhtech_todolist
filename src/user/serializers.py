@@ -3,7 +3,34 @@ Sérialiseur pour la gestion des utilisateurs dans l'application.
 """
 
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 from .models import User, Poste, Departement
+User = get_user_model()
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = User.EMAIL_FIELD
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        if email and password:
+            user = authenticate(request=self.context.get("request"), username=email, password=password)
+
+            if not user:
+                raise AuthenticationFailed(_("Cet utilisateur n'existe pas."), code="authorization")
+        else:
+            raise AuthenticationFailed(_("Email et mot de passe requis."), code="authorization")
+
+        data = super().validate(attrs)
+        data["user_id"] = user.id
+        data["email"] = user.email
+        return data
+
 
 
 class UserSerializer(serializers.ModelSerializer):

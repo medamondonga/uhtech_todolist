@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,7 +43,7 @@ INSTALLED_APPS = [
     'user', 'task', 'rest_framework', 
     'dj_rest_auth', 'rest_framework.authtoken',
     'corsheaders', #'django.contrib.sites'
-    'drf_yasg',
+    'drf_yasg','rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -128,7 +129,7 @@ STATIC_URL = "static/"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -155,4 +156,15 @@ SWAGGER_SETTINGS = {
     "LOGOUT_URL": "/admin/logout/"
 
 }
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),   # Token valide 1h
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),      # Refresh valide 7 jours
+}
+REST_USE_JWT = True
+
 
